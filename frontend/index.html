@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live Order Tracking</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0; background: #f5f6f8; color: #1a1a1a; }
+      .wrap { max-width: 900px; margin: 0 auto; padding: 16px; }
+      .card { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+      input, select, button { padding: 8px 12px; margin: 4px 4px 4px 0; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
+      button { background: #2563eb; color: #fff; border: 0; cursor: pointer; }
+      button.alt { background: #64748b; }
+      .err { color: #b91c1c; } .ok { color: #15803d; } .warn { color: #b45309; }
+      .leaflet-container { height: 380px; border-radius: 8px; }
+      code { background: #eef; padding: 2px 6px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

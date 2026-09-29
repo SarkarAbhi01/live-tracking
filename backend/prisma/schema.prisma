@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  customer
+  driver
+}
+
+enum OrderMode {
+  fixed_pickup // shop/warehouse jaisi ek fixed jagah se, customer sirf destination bharta hai
+  from_to      // customer khud pickup aur drop dono bharta hai
+}
+
+enum OrderStatus {
+  pending
+  accepted
+  picked_up
+  delivered
+  cancelled
+}
+
+model User {
+  id           Int             @id @default(autoincrement())
+  name         String
+  email        String          @unique
+  passwordHash String
+  role         Role
+  sessions     DriverSession[]
+  ordersMade   Order[]         @relation("CustomerOrders")
+  ordersTaken  Order[]         @relation("DriverOrders")
+  locations    DriverLocation[]
+}
+
+// Ek driver ka sirf ek active device/session (device binding, anti-spoof ke liye)
+model DriverSession {
+  id        Int      @id @default(autoincrement())
+  driverId  Int
+  driver    User     @relation(fields: [driverId], references: [id])
+  deviceId  String
+  secret    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// Fixed pickup point (jaise dukaan/warehouse address) - singleton row, id=1
+model ShopLocation {
+  id      Int    @id @default(1)
+  name    String
+  address String
+  lat     Float
+  lng     Float
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  customerId    Int
+  customer      User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  driverId      Int?
+  driver        User?       @relation("DriverOrders", fields: [driverId], references: [id])
+  mode          OrderMode
+  status        OrderStatus @default(pending)
+
+  // Dono mode me address text mandatory; lat/lng optional (sirf jab customer ne map se pick kiya ho)
+  pickupAddress String
+  pickupLat     Float?
+  pickupLng     Float?
+  dropAddress   String
+  dropLat       Float?
+  dropLng       Float?
+
+  trackingCode  String      @unique
+  flagged       Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  locations     DriverLocation[]
+}
+
+model DriverLocation {
+  id         BigInt   @id @default(autoincrement())
+  orderId    Int
+  order      Order    @relation(fields: [orderId], references: [id])
+  driverId   Int
+  driver     User     @relation(fields: [driverId], references: [id])
+  lat        Float
+  lng        Float
+  accuracy   Float?
+  speed      Float?
+  heading    Float?
+  clientTs   BigInt
+  serverTs   DateTime @default(now())
+  suspicious Boolean  @default(false)
+  reason     String?
+
+  @@index([orderId, id])
+}
