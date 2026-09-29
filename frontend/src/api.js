@@ -1,5 +1,6 @@
 export async function api(path, { method = 'GET', body, token, adminKey } = {}) {
-  const r = await fetch('/api' + path, {
+  const API_URL = import.meta.env.VITE_API_URL || '';
+  const r = await fetch(`${API_URL}/api${path}`, {
     method,
     headers: {
       'Content-Type': 'application/json',
