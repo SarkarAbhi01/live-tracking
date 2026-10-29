@@ -8,3 +8,5 @@ frontend/.env
 
 node_modules/
 
+.vercel
+.env*
